@@ -2,8 +2,10 @@ package ExamenLab;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import javax.swing.JOptionPane;
 
 public class PSNUsers {
     
@@ -41,7 +43,10 @@ public class PSNUsers {
             usuarios.writeInt(0);
             usuarios.writeBoolean(true);
             users.add(username, posregistro);
+            JOptionPane.showMessageDialog(null, "Se ha creado el usuario exitosamente", "Usuario creado", JOptionPane.INFORMATION_MESSAGE);
+            return;
         }
+        JOptionPane.showMessageDialog(null, "El usuario ya está creado", "Error", JOptionPane.ERROR_MESSAGE);
     }
     
     public void deactivateUser(String username)throws IOException{
@@ -55,10 +60,20 @@ public class PSNUsers {
     }
     
     public void addTrophyTo(String username, String juego, String nombretrofeo, Trophy tipo) throws IOException{
-        RandomAccessFile trofeos = new RandomAccessFile("psn.data","w");
+        RandomAccessFile trofeos = new RandomAccessFile("psn.data","rw");
         if(trofeos.length()!=0){
             trofeos.seek(trofeos.length());
         }
+        usuarios.seek(users.Search(username));
+        usuarios.readUTF();
+        long mantenerse=usuarios.getFilePointer();
+        int puntos = usuarios.readInt();
+        usuarios.seek(mantenerse);
+        usuarios.writeInt(puntos+tipo.points);
+        mantenerse=usuarios.getFilePointer();
+        int cantrofeos = usuarios.readInt();
+        usuarios.seek(mantenerse);
+        usuarios.writeInt(cantrofeos+=1);
         trofeos.writeUTF(username);
         trofeos.writeUTF(tipo.name());
         trofeos.writeUTF(juego);
@@ -68,7 +83,7 @@ public class PSNUsers {
     
     public String playerInfo(String username) throws IOException{
         if(users.Search(username)!=-1){
-            RandomAccessFile trofeos = new RandomAccessFile("psn.data","r");
+            RandomAccessFile trofeos = new RandomAccessFile("psn.data","rw");
             String datos = username+"\n";
             usuarios.seek(users.Search(username));
             datos+="Nombre: "+usuarios.readUTF()+"\n";
@@ -90,5 +105,10 @@ public class PSNUsers {
             return datos;
         }
         return null;
+    }
+    
+    //Funcion auxiliar de la otra
+    public ArrayList<String> getAllUsers(){
+        return users.getAllActiveUsers();
     }
 }

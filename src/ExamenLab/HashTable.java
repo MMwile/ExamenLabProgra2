@@ -1,5 +1,7 @@
 package ExamenLab;
 
+import java.util.ArrayList;
+
 public class HashTable {
     
     private Entry inicio=null;
@@ -52,5 +54,19 @@ public class HashTable {
             }
         }
         return -1;
+    }
+    
+    //Inge no pidio esta funcion pero yo la utilizo para listar todos los usuarios activos
+    public ArrayList<String> getAllActiveUsers(){
+        ArrayList<String> users = new ArrayList();
+        if(inicio!=null){
+            Entry temporal=inicio;
+            while(temporal!=null){
+                users.add(temporal.username);
+                temporal=temporal.siguiente;
+            }
+            return users;
+        }
+        return null;
     }
 }
